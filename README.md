@@ -1,0 +1,2 @@
+# HGbattleZone
+all players availeble
