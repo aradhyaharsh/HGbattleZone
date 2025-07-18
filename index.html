@@ -1,0 +1,1402 @@
+﻿<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF Custom Room - Professional Tournament Platform</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+<!-- Firebase SDKs -->
+<script type="module">
+  // Import Firebase modules
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  // ✅ YOUR FIREBASE CONFIGURATION
+  const firebaseConfig = {
+    apiKey: "AIzaSyBzfxrDGswRqv3buttpxDFP4nICB025UrA",
+    authDomain: "hgbattlezone-live.firebaseapp.com",
+    projectId: "hgbattlezone-live",
+    storageBucket: "hgbattlezone-live.appspot.com",
+    messagingSenderId: "782781083399",
+    appId: "1:782781083399:web:eda54ac3fe3bcb76119fa2"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  console.log("Firebase initialized successfully.");
+</script>
+
+    <!-- Google Fonts: Inter for UI, Bebas Neue for headings -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles and extensive CSS for a professional look -->
+    <style>
+        /* Custom font families */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Dark Gray background */
+            color: #F3F4F6; /* Light Gray text */
+        }
+
+        .font-bebas {
+            font-family: 'Bebas Neue', cursive;
+        }
+
+        /* Custom gradient text */
+        .gradient-text {
+            background: linear-gradient(90deg, #F97316, #EC4899, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+
+        /* Glassmorphism effect for cards and modals */
+        .glass-card {
+            background: rgba(31, 41, 55, 0.6); /* Semi-transparent dark gray */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+        }
+        
+        .glass-modal {
+            background: rgba(17, 24, 39, 0.8); /* Darker semi-transparent */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Custom scrollbar for a modern look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1F2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4F46E5;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6366F1;
+        }
+
+        /* Button hover effects */
+        .btn-primary {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+        }
+        
+        .btn-secondary {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+        }
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Animation for modals */
+        .modal-enter {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-leave {
+            animation: fadeOut 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95); }
+        }
+        
+        /* Keyframes for glowing effect */
+        @keyframes glowing {
+            0% { box-shadow: 0 0 5px #F97316, 0 0 10px #F97316, 0 0 15px #F97316; }
+            50% { box-shadow: 0 0 10px #EC4899, 0 0 20px #EC4899, 0 0 30px #EC4899; }
+            100% { box-shadow: 0 0 5px #8B5CF6, 0 0 10px #8B5CF6, 0 0 15px #8B5CF6; }
+        }
+        
+        .live-indicator {
+            width: 12px;
+            height: 12px;
+            background-color: #22c55e; /* Green-500 */
+            border-radius: 50%;
+            animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.6, 1);
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+        
+        /* Styles for Moderator Tabs */
+        .mod-tab {
+            cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .mod-tab.active {
+            border-bottom-color: #06b6d4; /* cyan-500 */
+            color: #06b6d4;
+        }
+        .mod-tab-content {
+            display: none;
+        }
+        .mod-tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+
+    <!-- Main Container -->
+    <div id="app" class="min-h-screen flex flex-col">
+
+        <!-- =================================================================== -->
+        <!-- HEADER / NAVIGATION BAR                                             -->
+        <!-- =================================================================== -->
+        <header class="glass-card sticky top-0 z-50 shadow-lg shadow-black/20 m-2 md:m-4">
+            <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    <!-- Logo -->
+                    <div class="flex-shrink-0">
+                        <a href="#" onclick="app.navigateTo('home')" class="text-3xl font-bebas gradient-text tracking-wider">
+                            FF CUSTOMS
+                        </a>
+                    </div>
+
+                    <!-- Desktop Menu -->
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-center space-x-4">
+                            <a href="#" onclick="app.navigateTo('home')" class="nav-link text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                            <a href="#" onclick="app.navigateTo('tournaments')" class="nav-link text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Tournaments</a>
+                            <a href="#" onclick="app.navigateTo('leaderboard')" class="nav-link text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Leaderboard</a>
+                            <a href="#" onclick="app.navigateTo('rules')" class="nav-link text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Rules</a>
+                             <!-- Moderator Button -->
+                            <button onclick="app.showModeratorLoginModal()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Moderator</button>
+                        </div>
+                    </div>
+
+                    <!-- User Profile / Login Button -->
+                    <div class="hidden md:block">
+                        <div id="user-session-desktop" class="flex items-center space-x-4">
+                            <!-- This will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <div class="-mr-2 flex md:hidden">
+                        <button type="button" onclick="app.toggleMobileMenu()" class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                            <span class="sr-only">Open main menu</span>
+                            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                            <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Mobile Menu -->
+            <div class="md:hidden hidden" id="mobile-menu">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a href="#" onclick="app.navigateTo('home')" class="nav-link text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                    <a href="#" onclick="app.navigateTo('tournaments')" class="nav-link text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Tournaments</a>
+                    <a href="#" onclick="app.navigateTo('leaderboard')" class="nav-link text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Leaderboard</a>
+                    <a href="#" onclick="app.navigateTo('rules')" class="nav-link text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Rules</a>
+                    <!-- Moderator Link for Mobile -->
+                    <a href="#" onclick="app.showModeratorLoginModal(); app.closeMobileMenu();" class="text-cyan-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Moderator Panel</a>
+                </div>
+                <div id="user-session-mobile" class="pt-4 pb-3 border-t border-gray-700">
+                     <!-- This will be populated by JavaScript -->
+                </div>
+            </div>
+        </header>
+
+
+        <!-- =================================================================== -->
+        <!-- MAIN CONTENT AREA                                                   -->
+        <!-- =================================================================== -->
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+            
+            <!-- HOME PAGE -->
+            <div id="page-home" class="page">
+                <!-- Hero Section -->
+                <section class="text-center my-12 md:my-24">
+                    <h1 id="home-heading" class="font-bebas text-5xl md:text-8xl font-bold tracking-wider gradient-text">
+                        <!-- Content injected by JS -->
+                    </h1>
+                    <p id="home-paragraph" class="mt-4 text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
+                        <!-- Content injected by JS -->
+                    </p>
+                    <div class="mt-8 flex justify-center gap-4">
+                        <button onclick="app.navigateTo('tournaments')" class="btn-primary bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg">
+                            Find Match
+                        </button>
+                        <button onclick="app.showLoginModal()" class="btn-secondary bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg">
+                            Join Now
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Featured Tournaments Section -->
+                <section id="featured-tournaments" class="my-16">
+                    <h2 class="text-3xl md:text-4xl font-bebas tracking-wide text-center mb-8">
+                        <span class="gradient-text">Upcoming</span> Battles
+                    </h2>
+                    <div id="featured-tournaments-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Tournament cards will be injected here by JavaScript -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- TOURNAMENTS PAGE -->
+            <div id="page-tournaments" class="page hidden">
+                <h1 class="text-4xl md:text-5xl font-bebas tracking-wider gradient-text mb-8 text-center">All Tournaments</h1>
+                <!-- Filter Section -->
+                <div class="flex flex-wrap justify-center gap-2 mb-8">
+                    <button onclick="app.filterTournaments('all')" class="filter-btn bg-gray-700 text-white px-4 py-2 rounded-full text-sm">All</button>
+                    <button onclick="app.filterTournaments('upcoming')" class="filter-btn bg-gray-800 text-gray-300 px-4 py-2 rounded-full text-sm">Upcoming</button>
+                    <button onclick="app.filterTournaments('live')" class="filter-btn bg-gray-800 text-gray-300 px-4 py-2 rounded-full text-sm">Live</button>
+                    <button onclick="app.filterTournaments('finished')" class="filter-btn bg-gray-800 text-gray-300 px-4 py-2 rounded-full text-sm">Finished</button>
+                </div>
+                <div id="tournaments-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Tournament cards will be injected here by JavaScript -->
+                </div>
+            </div>
+
+            <!-- LEADERBOARD PAGE -->
+            <div id="page-leaderboard" class="page hidden">
+                <h1 class="text-4xl md:text-5xl font-bebas tracking-wider gradient-text mb-8 text-center">Top Players</h1>
+                 <div class="glass-card p-4 md:p-8">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-700">
+                            <thead class="bg-gray-800">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Rank</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Player</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Kills</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Wins</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Points</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-body" class="bg-gray-900/50 divide-y divide-gray-800">
+                                <!-- Leaderboard data will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RULES PAGE -->
+            <div id="page-rules" class="page hidden">
+                <h1 class="text-4xl md:text-5xl font-bebas tracking-wider gradient-text mb-8 text-center">Tournament Rules</h1>
+                <div id="rules-content" class="glass-card p-6 md:p-10 max-w-4xl mx-auto space-y-6 text-gray-300">
+                    <!-- Rules content injected by JS -->
+                </div>
+            </div>
+
+            <!-- PROFILE PAGE -->
+            <div id="page-profile" class="page hidden">
+                 <div id="profile-content" class="max-w-4xl mx-auto">
+                    <!-- Profile data will be injected here -->
+                </div>
+            </div>
+            
+             <!-- ADMIN PAGE -->
+            <div id="page-admin" class="page hidden">
+                <h1 class="text-4xl md:text-5xl font-bebas tracking-wider gradient-text mb-8 text-center">Admin Panel</h1>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Create Tournament Form -->
+                    <div class="glass-card p-6">
+                        <h2 class="text-2xl font-bold mb-4 text-orange-400">Create New Tournament</h2>
+                        <form id="create-tournament-form" class="space-y-4">
+                            <input type="text" id="admin-title" placeholder="Tournament Title (e.g., Weekend Bonanza)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <input type="datetime-local" id="admin-time" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <select id="admin-map" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                <option>Bermuda</option>
+                                <option>Kalahari</option>
+                                <option>Purgatory</option>
+                                <option>Alpine</option>
+                            </select>
+                            <select id="admin-mode" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                <option>Solo</option>
+                                <option>Duo</option>
+                                <option>Squad</option>
+                            </select>
+                            <input type="number" id="admin-fee" placeholder="Entry Fee (0 for free)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <input type="text" id="admin-prize" placeholder="Prize Pool (e.g., 5000 Diamonds)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <button type="submit" class="w-full btn-primary bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-2 px-4 rounded-lg">Create Tournament</button>
+                        </form>
+                    </div>
+                    <!-- Manage Tournaments -->
+                    <div class="glass-card p-6">
+                        <h2 class="text-2xl font-bold mb-4 text-purple-400">Manage Tournaments</h2>
+                        <div id="admin-tournament-list" class="space-y-3 max-h-96 overflow-y-auto">
+                            <!-- Admin tournament list will be injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODERATOR PAGE -->
+            <div id="page-moderator" class="page hidden">
+                <h1 class="text-4xl md:text-5xl font-bebas tracking-wider gradient-text mb-8 text-center">Moderator Panel</h1>
+                <div id="moderator-content" class="glass-card p-6">
+                    <!-- Tab Navigation -->
+                    <div class="flex border-b border-gray-700 mb-6">
+                        <div onclick="app.switchModTab('tournaments')" class="mod-tab active" data-tab="tournaments">Manage Tournaments</div>
+                        <div onclick="app.switchModTab('homepage')" class="mod-tab" data-tab="homepage">Edit Home Page</div>
+                        <div onclick="app.switchModTab('leaderboard')" class="mod-tab" data-tab="leaderboard">Edit Leaderboard</div>
+                        <div onclick="app.switchModTab('rules')" class="mod-tab" data-tab="rules">Edit Rules</div>
+                    </div>
+                    
+                    <!-- Tab Content -->
+                    <div id="mod-tab-tournaments" class="mod-tab-content active">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-cyan-400">Manage Tournaments</h2>
+                            <button onclick="document.getElementById('create-tournament-form').reset(); app.showEditModal(null, true)" class="btn-primary bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-2 px-4 rounded-lg">Add Match</button>
+                        </div>
+                        <div id="moderator-tournament-list" class="space-y-4 max-h-[60vh] overflow-y-auto pr-4"></div>
+                    </div>
+
+                    <div id="mod-tab-homepage" class="mod-tab-content">
+                        <h2 class="text-2xl font-bold text-cyan-400 mb-4">Edit Home Page Content</h2>
+                        <form id="edit-homepage-form" class="space-y-4">
+                            <div>
+                                <label for="homepage-heading" class="block mb-2 text-sm font-bold text-gray-400">Main Heading</label>
+                                <textarea id="homepage-heading" rows="2" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"></textarea>
+                            </div>
+                            <div>
+                                <label for="homepage-paragraph" class="block mb-2 text-sm font-bold text-gray-400">Paragraph</label>
+                                <textarea id="homepage-paragraph" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"></textarea>
+                            </div>
+                            <button type="submit" class="btn-secondary bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-2 px-4 rounded-lg">Save Home Page</button>
+                        </form>
+                    </div>
+
+                    <div id="mod-tab-leaderboard" class="mod-tab-content">
+                        <h2 class="text-2xl font-bold text-cyan-400 mb-4">Edit Leaderboard</h2>
+                        <div class="space-y-4">
+                            <!-- Add Player Form -->
+                            <form id="add-leaderboard-form" class="grid grid-cols-1 sm:grid-cols-5 gap-2 items-end bg-gray-800/50 p-3 rounded-lg">
+                                <input type="text" id="lb-ign" placeholder="Player IGN" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 col-span-1 sm:col-span-2">
+                                <input type="number" id="lb-kills" placeholder="Kills" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                                <input type="number" id="lb-wins" placeholder="Wins" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                                <button type="submit" class="w-full btn-primary bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg">Add Player</button>
+                            </form>
+                            <!-- Leaderboard Edit List -->
+                            <div id="leaderboard-edit-list" class="space-y-2 max-h-[50vh] overflow-y-auto pr-2"></div>
+                        </div>
+                    </div>
+
+                    <div id="mod-tab-rules" class="mod-tab-content">
+                        <h2 class="text-2xl font-bold text-cyan-400 mb-4">Edit Rules</h2>
+                        <form id="edit-rules-form" class="space-y-4">
+                            <div>
+                                <label for="rules-general" class="block mb-2 text-sm font-bold text-gray-400">1. General Rules (har line ek niyam)</label>
+                                <textarea id="rules-general" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"></textarea>
+                            </div>
+                             <div>
+                                <label for="rules-gameplay" class="block mb-2 text-sm font-bold text-gray-400">2. Gameplay Rules (har line ek niyam)</label>
+                                <textarea id="rules-gameplay" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"></textarea>
+                            </div>
+                            <div>
+                                <label for="rules-points" class="block mb-2 text-sm font-bold text-gray-400">3. Point System (paragraph)</label>
+                                <textarea id="rules-points" rows="3" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"></textarea>
+                            </div>
+                            <button type="submit" class="btn-secondary bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-2 px-4 rounded-lg">Save Rules</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        
+        <!-- =================================================================== -->
+        <!-- FOOTER                                                              -->
+        <!-- =================================================================== -->
+        <footer class="bg-gray-900/50 mt-8">
+            <div class="container mx-auto px-8 py-4 text-center text-gray-500">
+                <p>&copy; 2025 FF Custom Rooms. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MODALS (Hidden by default)                                          -->
+    <!-- =================================================================== -->
+    
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/70" onclick="app.hideLoginModal()"></div>
+        <div class="glass-modal w-full max-w-md p-8 rounded-2xl shadow-2xl relative modal-enter">
+            <h2 class="text-3xl font-bebas tracking-wider gradient-text text-center mb-6">Login to Your Account</h2>
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label for="login-username" class="text-sm font-bold text-gray-400 block mb-2">Username</label>
+                    <input type="text" id="login-username" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                </div>
+                <div>
+                    <label for="login-password" class="text-sm font-bold text-gray-400 block mb-2">Password</label>
+                    <input type="password" id="login-password" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                </div>
+                <button type="submit" class="w-full btn-primary bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-4 rounded-lg text-lg">Login</button>
+            </form>
+            <p class="text-center mt-4 text-sm text-gray-400">
+                Don't have an account? <a href="#" onclick="app.showRegisterModal()" class="font-bold text-orange-400 hover:underline">Register now</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/70" onclick="app.hideRegisterModal()"></div>
+        <div class="glass-modal w-full max-w-md p-8 rounded-2xl shadow-2xl relative modal-enter">
+            <h2 class="text-3xl font-bebas tracking-wider gradient-text text-center mb-6">Create a New Account</h2>
+            <form id="register-form" class="space-y-4">
+                <input type="text" id="register-username" placeholder="Choose a Username" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                <input type="text" id="register-ign" placeholder="Your In-Game Name (IGN)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                <input type="password" id="register-password" placeholder="Create a Password" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                <button type="submit" class="w-full btn-primary bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-4 rounded-lg text-lg">Register</button>
+            </form>
+            <p class="text-center mt-4 text-sm text-gray-400">
+                Already have an account? <a href="#" onclick="app.showLoginModal()" class="font-bold text-orange-400 hover:underline">Login here</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Tournament Detail Modal -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/70" onclick="app.hideDetailModal()"></div>
+        <div id="detail-modal-content" class="glass-modal w-full max-w-2xl p-6 md:p-8 rounded-2xl shadow-2xl relative modal-enter max-h-[90vh] overflow-y-auto">
+            <!-- Details will be injected here by JavaScript -->
+        </div>
+    </div>
+    
+    <!-- Moderator Login Modal -->
+    <div id="moderator-login-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/70" onclick="app.hideModeratorLoginModal()"></div>
+        <div class="glass-modal w-full max-w-md p-8 rounded-2xl shadow-2xl relative modal-enter">
+            <h2 class="text-3xl font-bebas tracking-wider text-cyan-400 text-center mb-6">Moderator Access</h2>
+            <form id="moderator-login-form" class="space-y-6">
+                <div>
+                    <label for="moderator-password" class="text-sm font-bold text-gray-400 block mb-2">Password</label>
+                    <input type="password" id="moderator-password" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500" required>
+                </div>
+                <button type="submit" class="w-full btn-secondary bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-3 px-4 rounded-lg text-lg">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit/Create Tournament Modal -->
+    <div id="edit-tournament-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/70" onclick="app.hideEditModal()"></div>
+        <div class="glass-modal w-full max-w-lg p-8 rounded-2xl shadow-2xl relative modal-enter max-h-[90vh] overflow-y-auto">
+             <h2 id="edit-modal-title" class="text-2xl font-bebas tracking-wider gradient-text text-center mb-6">Edit Tournament</h2>
+             <form id="edit-tournament-form" class="space-y-4">
+                <input type="hidden" id="edit-tournament-id">
+                <input type="text" id="edit-title" placeholder="Tournament Title" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <input type="datetime-local" id="edit-time" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <input type="text" id="edit-prize" placeholder="Prize Pool" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <input type="number" id="edit-fee" placeholder="Entry Fee" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <input type="text" id="edit-room-id" placeholder="Room ID (optional)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <input type="text" id="edit-room-password" placeholder="Room Password (optional)" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <select id="edit-status" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    <option value="Upcoming">Upcoming</option>
+                    <option value="Live">Live</option>
+                    <option value="Finished">Finished</option>
+                </select>
+                <button type="submit" class="w-full btn-secondary bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-3 px-4 rounded-lg text-lg">Save Changes</button>
+             </form>
+        </div>
+    </div>
+
+
+    <!-- Custom Alert/Notification Box -->
+    <div id="notification-box" class="fixed bottom-5 right-5 z-50 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg transform translate-x-[120%] transition-transform duration-500">
+        <p id="notification-message">This is a notification!</p>
+    </div>
+
+
+    <!-- =================================================================== -->
+    <!-- JAVASCRIPT LOGIC                                                    -->
+    <!-- =================================================================== -->
+    <script>
+    // ######################################################################
+    // #                                                                    #
+    // #                 FREE FIRE TOURNAMENT PLATFORM SCRIPT               #
+    // #                                                                    #
+    // ######################################################################
+
+    const app = {
+
+        // ===================================================================
+        // STATE MANAGEMENT
+        // ===================================================================
+        state: {
+            currentUser: null,
+            isModerator: false, 
+            editingTournamentId: null, 
+            currentPage: 'home',
+            currentFilter: 'all',
+            tournaments: [],
+            users: [],
+            leaderboard: [],
+            homeContent: {
+                heading: "APNI SKILL DIKHAO, CHAMPION BAN JAO",
+                paragraph: "Bharat ke sabse bade Free Fire custom tournament platform mein shaamil hon. Rozana matches, bada prize pool, aur behtareen competition ka anubhav karein."
+            },
+            rulesContent: {
+                general: [
+                    "Sabhi players ko anushasan banaye rakhna hoga.",
+                    "Kisi bhi tarah ki gaali-galoch ya badtameezi bardasht nahi ki jayegi.",
+                    "Match shuru hone ke 10 minute pehle lobby mein aa jana anivarya hai."
+                ],
+                gameplay: [
+                    "Teaming up sakht mana hai. Agar koi team-up karte hue pakda gaya, to use tournament se disqualify kar diya jayega.",
+                    "Hacks, scripts, ya kisi bhi third-party software ka istemal karna pratibandhit hai.",
+                    "Glitches ya bugs ka fayda uthana mana hai."
+                ],
+                points: "Points kill aur placement ke aadhar par diye jayenge. Point table ke liye tournament details check karein."
+            }
+        },
+
+        // ===================================================================
+        // INITIALIZATION
+        // ===================================================================
+        init() {
+            console.log("Initializing Tournament Platform...");
+            this.addFormSubmitListeners();
+            this.generateMockData();
+            this.updateUI();
+            setInterval(() => {
+                this.updateLiveCountdowns();
+            }, 1000);
+            console.log("Platform Initialized Successfully.");
+        },
+
+        // ===================================================================
+        // UI UPDATE & RENDERING
+        // ===================================================================
+        updateUI() {
+            console.log(`Updating UI for page: ${this.state.currentPage}`);
+            this.updateUserSessionUI();
+            this.renderPage();
+            this.updateActiveNavLinks();
+        },
+
+        renderPage() {
+            document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
+            const activePage = document.getElementById(`page-${this.state.currentPage}`);
+            if (activePage) {
+                activePage.classList.remove('hidden');
+            }
+
+            switch (this.state.currentPage) {
+                case 'home': this.renderHomePage(); break;
+                case 'tournaments': this.renderTournamentsPage(); break;
+                case 'leaderboard': this.renderLeaderboardPage(); break;
+                case 'rules': this.renderRulesPage(); break;
+                case 'profile': this.renderProfilePage(); break;
+                case 'admin': this.renderAdminPage(); break;
+                case 'moderator': this.renderModeratorPage(); break;
+            }
+        },
+
+        renderHomePage() {
+            document.getElementById('home-heading').textContent = this.state.homeContent.heading;
+            document.getElementById('home-paragraph').textContent = this.state.homeContent.paragraph;
+
+            const featuredList = document.getElementById('featured-tournaments-list');
+            const featured = this.state.tournaments
+                .filter(t => t.status === 'Upcoming')
+                .slice(0, 3);
+            
+            if (featured.length > 0) {
+                featuredList.innerHTML = featured.map(t => this.createTournamentCard(t)).join('');
+            } else {
+                featuredList.innerHTML = `<p class="text-gray-400 col-span-3 text-center">Koi upcoming tournament nahi hai. Jald hi check karein!</p>`;
+            }
+        },
+
+        renderTournamentsPage() {
+            const list = document.getElementById('tournaments-list');
+            const filtered = this.state.tournaments.filter(t => {
+                if (this.state.currentFilter === 'all') return true;
+                return t.status.toLowerCase() === this.state.currentFilter;
+            });
+
+            if (filtered.length > 0) {
+                list.innerHTML = filtered.map(t => this.createTournamentCard(t)).join('');
+            } else {
+                list.innerHTML = `<p class="text-gray-400 col-span-3 text-center">Is category mein koi tournament nahi mila.</p>`;
+            }
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-gray-700', 'text-white');
+                btn.classList.add('bg-gray-800', 'text-gray-300');
+            });
+            document.querySelector(`.filter-btn[onclick="app.filterTournaments('${this.state.currentFilter}')"]`).classList.add('bg-gray-700', 'text-white');
+        },
+        
+        renderLeaderboardPage() {
+            const tbody = document.getElementById('leaderboard-body');
+            this.state.leaderboard.sort((a, b) => b.points - a.points);
+            tbody.innerHTML = this.state.leaderboard.map((player, index) => `
+                <tr class="hover:bg-gray-800 transition-colors duration-200 ${index === 0 ? 'bg-yellow-500/10' : index === 1 ? 'bg-gray-400/10' : index === 2 ? 'bg-orange-700/10' : ''}">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${index < 3 ? 'text-xl font-bold gradient-text' : 'text-gray-300'}">${index + 1}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${player.ign}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${player.kills}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${player.wins}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-orange-400">${player.points}</td>
+                </tr>
+            `).join('');
+        },
+        
+        renderRulesPage() {
+            const rules = this.state.rulesContent;
+            const contentDiv = document.getElementById('rules-content');
+            contentDiv.innerHTML = `
+                <div>
+                    <h2 class="text-2xl font-bold text-orange-400 mb-2">1. General Rules</h2>
+                    <ul class="list-disc list-inside space-y-1">
+                        ${rules.general.map(rule => `<li>${rule}</li>`).join('')}
+                    </ul>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-orange-400 mb-2">2. Gameplay Rules</h2>
+                    <ul class="list-disc list-inside space-y-1">
+                        ${rules.gameplay.map(rule => `<li>${rule}</li>`).join('')}
+                    </ul>
+                </div>
+                 <div>
+                    <h2 class="text-2xl font-bold text-orange-400 mb-2">3. Point System</h2>
+                    <p>${rules.points}</p>
+                </div>
+            `;
+        },
+
+        renderProfilePage() {
+            const content = document.getElementById('profile-content');
+            if (!this.state.currentUser) {
+                content.innerHTML = `<p class="text-center text-gray-400">Profile dekhne ke liye कृपया login karein.</p>`;
+                return;
+            }
+            const user = this.state.currentUser;
+            const registered = this.state.tournaments.filter(t => user.registeredTournaments.includes(t.id));
+
+            content.innerHTML = `
+                <div class="glass-card p-8">
+                    <div class="flex flex-col md:flex-row items-center gap-8">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${user.username}" alt="Avatar" class="w-32 h-32 rounded-full border-4 border-orange-500">
+                        <div>
+                            <h1 class="text-4xl font-bold">${user.ign}</h1>
+                            <p class="text-lg text-gray-400">@${user.username}</p>
+                            ${user.isAdmin ? '<span class="mt-2 inline-block bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">ADMIN</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="mt-10">
+                        <h2 class="text-2xl font-bold text-orange-400 mb-4">Registered Tournaments</h2>
+                        <div class="space-y-4">
+                            ${registered.length > 0 ? registered.map(t => this.createMiniTournamentCard(t)).join('') : '<p class="text-gray-500">Aapne kisi tournament ke liye register nahi kiya hai.</p>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+        
+        renderAdminPage() {
+            if (!this.state.currentUser || !this.state.currentUser.isAdmin) {
+                document.getElementById('page-admin').innerHTML = `<p class="text-center text-red-500">Access Denied. You are not an admin.</p>`;
+                return;
+            }
+            const list = document.getElementById('admin-tournament-list');
+            list.innerHTML = this.state.tournaments.map(t => `
+                <div class="bg-gray-800 p-3 rounded-lg flex justify-between items-center">
+                    <div>
+                        <p class="font-bold">${t.title}</p>
+                        <p class="text-xs text-gray-400">${t.status} - ${new Date(t.time).toLocaleString()}</p>
+                    </div>
+                    <button onclick="app.deleteTournament('${t.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm">Delete</button>
+                </div>
+            `).join('');
+        },
+        
+        renderModeratorPage() { 
+            if (!this.state.isModerator) {
+                document.getElementById('moderator-content').innerHTML = `<p class="text-center text-red-500">Access Denied. Please login as a moderator.</p>`;
+                return;
+            }
+            this.renderModTournaments();
+            this.renderModHomepageForm();
+            this.renderModLeaderboard();
+            this.renderModRulesForm();
+        },
+        
+        renderModTournaments() {
+            const list = document.getElementById('moderator-tournament-list');
+            const sortedTournaments = [...this.state.tournaments].sort((a, b) => new Date(b.time) - new Date(a.time));
+            list.innerHTML = sortedTournaments.map(t => `
+                <div class="bg-gray-800 p-3 rounded-lg flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                    <div class="flex-grow">
+                        <p class="font-bold text-white">${t.title}</p>
+                        <p class="text-xs text-gray-400">${t.status} - ${new Date(t.time).toLocaleString()}</p>
+                        <p class="text-xs text-gray-500">ID: ${t.roomId || 'N/A'} | Pass: ${t.password || 'N/A'}</p>
+                    </div>
+                    <div class="flex-shrink-0 flex gap-2">
+                        <button onclick="app.showEditModal('${t.id}')" class="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-md text-sm font-semibold">Edit</button>
+                        <button onclick="app.deleteTournament('${t.id}')" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-semibold">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        },
+
+        renderModHomepageForm() {
+            document.getElementById('homepage-heading').value = this.state.homeContent.heading;
+            document.getElementById('homepage-paragraph').value = this.state.homeContent.paragraph;
+        },
+
+        renderModLeaderboard() {
+            const list = document.getElementById('leaderboard-edit-list');
+            this.state.leaderboard.sort((a, b) => b.points - a.points);
+            list.innerHTML = this.state.leaderboard.map((player, index) => `
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 items-center bg-gray-800/50 p-2 rounded-lg">
+                    <p class="text-white col-span-1 sm:col-span-2">${index + 1}. ${player.ign}</p>
+                    <p class="text-gray-400 text-sm">K: ${player.kills}</p>
+                    <p class="text-gray-400 text-sm">W: ${player.wins}</p>
+                    <button onclick="app.deleteLeaderboardPlayer(${index})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm">Delete</button>
+                </div>
+            `).join('');
+        },
+
+        renderModRulesForm() {
+            document.getElementById('rules-general').value = this.state.rulesContent.general.join('\n');
+            document.getElementById('rules-gameplay').value = this.state.rulesContent.gameplay.join('\n');
+            document.getElementById('rules-points').value = this.state.rulesContent.points;
+        },
+
+        updateUserSessionUI() {
+            const desktopSession = document.getElementById('user-session-desktop');
+            const mobileSession = document.getElementById('user-session-mobile');
+            let sessionHTML, mobileSessionHTML;
+
+            if (this.state.currentUser) {
+                const user = this.state.currentUser;
+                const adminLink = user.isAdmin ? `<a href="#" onclick="app.navigateTo('admin')" class="text-purple-400 hover:text-purple-300 font-bold text-sm">Admin Panel</a>` : '';
+                
+                sessionHTML = `
+                    ${adminLink}
+                    <div class="relative">
+                        <button onclick="app.navigateTo('profile')" class="flex items-center space-x-2">
+                            <span class="font-medium text-sm">${user.ign}</span>
+                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=${user.username}" alt="Avatar" class="w-10 h-10 rounded-full border-2 border-orange-500">
+                        </button>
+                    </div>
+                    <button onclick="app.logout()" class="bg-gray-700 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-600">Logout</button>
+                `;
+                mobileSessionHTML = `
+                    <div class="flex items-center px-5">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="https://api.dicebear.com/7.x/bottts/svg?seed=${user.username}" alt="">
+                        </div>
+                        <div class="ml-3">
+                            <div class="text-base font-medium leading-none text-white">${user.ign}</div>
+                            <div class="text-sm font-medium leading-none text-gray-400">@${user.username}</div>
+                        </div>
+                    </div>
+                    <div class="mt-3 px-2 space-y-1">
+                        <a href="#" onclick="app.navigateTo('profile')" class="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">Your Profile</a>
+                        ${user.isAdmin ? `<a href="#" onclick="app.navigateTo('admin')" class="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">Admin Panel</a>` : ''}
+                        <a href="#" onclick="app.logout()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">Logout</a>
+                    </div>
+                `;
+            } else {
+                sessionHTML = `
+                    <button onclick="app.showLoginModal()" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Login</button>
+                    <button onclick="app.showRegisterModal()" class="btn-primary bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold py-2 px-4 rounded-md text-sm">Register</button>
+                `;
+                mobileSessionHTML = `
+                    <div class="px-2 space-y-1">
+                        <a href="#" onclick="app.showLoginModal()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">Login</a>
+                        <a href="#" onclick="app.showRegisterModal()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">Register</a>
+                    </div>
+                `;
+            }
+
+            desktopSession.innerHTML = sessionHTML;
+            mobileSession.innerHTML = mobileSessionHTML;
+        },
+
+        // ===================================================================
+        // COMPONENT FACTORIES
+        // ===================================================================
+        createTournamentCard(tournament) {
+            const isRegistered = this.state.currentUser && this.state.currentUser.registeredTournaments.includes(tournament.id);
+            const cardClass = tournament.status === 'Live' ? 'animate-glowing' : '';
+
+            return `
+                <div class="glass-card p-5 flex flex-col justify-between transition-transform transform hover:-translate-y-2 ${cardClass}">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-bold text-white">${tournament.title}</h3>
+                            <span class="text-xs font-bold px-3 py-1 rounded-full ${
+                                tournament.status === 'Upcoming' ? 'bg-blue-500/50 text-blue-200' :
+                                tournament.status === 'Live' ? 'bg-green-500/50 text-green-200 flex items-center gap-2' :
+                                'bg-gray-600/50 text-gray-300'
+                            }">
+                                ${tournament.status === 'Live' ? '<span class="live-indicator"></span>' : ''}
+                                ${tournament.status}
+                            </span>
+                        </div>
+                        <div class="text-sm text-gray-400 space-y-2 mb-4">
+                            <p><strong>Time:</strong> ${new Date(tournament.time).toLocaleString()}</p>
+                            <p><strong>Map:</strong> ${tournament.map} | <strong>Mode:</strong> ${tournament.mode}</p>
+                            <p><strong>Entry Fee:</strong> <span class="font-bold text-yellow-400">${tournament.entryFee === 0 ? 'Free' : `${tournament.entryFee} Diamonds`}</span></p>
+                            <p><strong>Prize Pool:</strong> <span class="font-bold text-green-400">${tournament.prizePool}</span></p>
+                        </div>
+                    </div>
+                    <div class="mt-auto">
+                        <button onclick="app.showDetailModal('${tournament.id}')" class="w-full text-center font-semibold py-2 px-4 rounded-lg transition-colors duration-300
+                            ${isRegistered ? 'bg-green-600 text-white cursor-default' : 'bg-indigo-600 hover:bg-indigo-500 text-white'}">
+                            ${isRegistered ? 'Registered' : 'View Details'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        },
+        
+        createMiniTournamentCard(tournament) {
+            return `
+                <div class="bg-gray-800/50 p-4 rounded-lg flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-white">${tournament.title}</p>
+                        <p class="text-sm text-gray-400">${new Date(tournament.time).toLocaleDateString()}</p>
+                    </div>
+                    <span class="text-xs font-bold px-2 py-1 rounded-full ${tournament.status === 'Upcoming' ? 'bg-blue-500 text-white' : 'bg-gray-600 text-gray-300'}">${tournament.status}</span>
+                </div>
+            `;
+        },
+
+        // ===================================================================
+        // NAVIGATION & ROUTING
+        // ===================================================================
+        navigateTo(page) {
+            this.state.currentPage = page;
+            this.updateUI();
+            window.scrollTo(0, 0);
+            this.closeMobileMenu();
+        },
+        
+        updateActiveNavLinks() {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('bg-gray-900', 'text-white');
+                link.classList.add('text-gray-300', 'hover:bg-gray-700');
+                if (link.getAttribute('onclick').includes(`'${this.state.currentPage}'`)) {
+                    link.classList.add('bg-gray-900', 'text-white');
+                }
+            });
+        },
+        
+        toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const [iconOpen, iconClose] = menu.previousElementSibling.querySelectorAll('svg');
+            menu.classList.toggle('hidden');
+            iconOpen.classList.toggle('hidden');
+            iconClose.classList.toggle('hidden');
+        },
+
+        closeMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (!menu.classList.contains('hidden')) {
+                this.toggleMobileMenu();
+            }
+        },
+
+        switchModTab(tabName) {
+            document.querySelectorAll('.mod-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.mod-tab[data-tab="${tabName}"]`).classList.add('active');
+            
+            document.querySelectorAll('.mod-tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`mod-tab-${tabName}`).classList.add('active');
+        },
+
+        // ===================================================================
+        // MODAL HANDLING
+        // ===================================================================
+        showLoginModal() {
+            this.hideRegisterModal();
+            document.getElementById('login-modal').classList.remove('hidden');
+            document.getElementById('login-modal').classList.add('flex');
+        },
+
+        hideLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('flex');
+        },
+
+        showRegisterModal() {
+            this.hideLoginModal();
+            document.getElementById('register-modal').classList.remove('hidden');
+            document.getElementById('register-modal').classList.add('flex');
+        },
+
+        hideRegisterModal() {
+            document.getElementById('register-modal').classList.add('hidden');
+            document.getElementById('register-modal').classList.remove('flex');
+        },
+
+        showDetailModal(tournamentId) {
+            const tournament = this.state.tournaments.find(t => t.id === tournamentId);
+            if (!tournament) return;
+
+            const modalContent = document.getElementById('detail-modal-content');
+            const isRegistered = this.state.currentUser && this.state.currentUser.registeredTournaments.includes(tournament.id);
+            const canRegister = this.state.currentUser && !isRegistered && tournament.status === 'Upcoming';
+            
+            let roomDetailsHTML = '';
+            if (tournament.status === 'Live' && isRegistered) {
+                roomDetailsHTML = `
+                    <div class="bg-gray-900/50 p-4 rounded-lg text-center my-4">
+                        <h4 class="text-lg font-bold text-green-400">Room Details</h4>
+                        <p class="text-xl">ID: <span class="font-mono font-bold text-white">${tournament.roomId || 'TBA'}</span> ${tournament.roomId ? `<button onclick="app.copyToClipboard('${tournament.roomId}')" class="ml-2 text-sm bg-gray-700 px-2 py-1 rounded">Copy</button>` : ''}</p>
+                        <p class="text-xl">Password: <span class="font-mono font-bold text-white">${tournament.password || 'TBA'}</span> ${tournament.password ? `<button onclick="app.copyToClipboard('${tournament.password}')" class="ml-2 text-sm bg-gray-700 px-2 py-1 rounded">Copy</button>` : ''}</p>
+                    </div>
+                `;
+            } else if (tournament.status === 'Upcoming' && isRegistered) {
+                 roomDetailsHTML = `
+                    <div class="bg-gray-900/50 p-4 rounded-lg text-center my-4">
+                        <h4 class="text-lg font-bold text-yellow-400">Room details will be revealed soon!</h4>
+                        <div id="countdown-${tournament.id}" class="text-2xl font-mono font-bold text-white mt-2"></div>
+                    </div>
+                `;
+            }
+
+            modalContent.innerHTML = `
+                <h2 class="text-3xl font-bebas tracking-wider gradient-text mb-4">${tournament.title}</h2>
+                <div class="text-gray-300 space-y-3">
+                    <p><strong>Status:</strong> <span class="font-bold ${tournament.status === 'Live' ? 'text-green-400' : 'text-yellow-400'}">${tournament.status}</span></p>
+                    <p><strong>Time:</strong> ${new Date(tournament.time).toLocaleString()}</p>
+                    <p><strong>Map:</strong> ${tournament.map} | <strong>Mode:</strong> ${tournament.mode}</p>
+                    <p><strong>Entry Fee:</strong> <span class="font-bold text-yellow-400">${tournament.entryFee === 0 ? 'Free' : `${tournament.entryFee} Diamonds`}</span></p>
+                    <p><strong>Prize Pool:</strong> <span class="font-bold text-green-400">${tournament.prizePool}</span></p>
+                    <p><strong>Registered Players:</strong> ${tournament.registeredPlayers.length} / ${tournament.maxPlayers}</p>
+                </div>
+                ${roomDetailsHTML}
+                <div class="mt-6 text-center">
+                    ${
+                        canRegister ? `<button onclick="app.registerForTournament('${tournament.id}')" class="btn-primary bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-8 rounded-full text-lg">Register Now</button>` :
+                        isRegistered ? `<button class="bg-green-600 text-white font-bold py-3 px-8 rounded-full text-lg cursor-not-allowed" disabled>Successfully Registered</button>` :
+                        !this.state.currentUser ? `<p class="text-yellow-400">Please <a href="#" onclick="app.showLoginModal()" class="underline font-bold">login</a> to register.</p>` :
+                        `<p class="text-gray-500">Registration is closed.</p>`
+                    }
+                </div>
+            `;
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+            document.getElementById('detail-modal').classList.add('flex');
+        },
+
+        hideDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+            document.getElementById('detail-modal').classList.remove('flex');
+        },
+        
+        showEditModal(tournamentId, isCreating = false) {
+            const modal = document.getElementById('edit-tournament-modal');
+            const modalTitle = document.getElementById('edit-modal-title');
+            
+            if (isCreating) {
+                this.state.editingTournamentId = null;
+                modalTitle.textContent = "Create New Match";
+                document.getElementById('edit-tournament-form').reset();
+            } else {
+                const tournament = this.state.tournaments.find(t => t.id === tournamentId);
+                if (!tournament) return;
+                
+                this.state.editingTournamentId = tournamentId;
+                modalTitle.textContent = "Edit Tournament";
+
+                const date = new Date(tournament.time);
+                const offset = date.getTimezoneOffset();
+                const localDate = new Date(date.getTime() - (offset*60*1000));
+                const formattedDate = localDate.toISOString().slice(0,16);
+
+                document.getElementById('edit-tournament-id').value = tournament.id;
+                document.getElementById('edit-title').value = tournament.title;
+                document.getElementById('edit-time').value = formattedDate;
+                document.getElementById('edit-prize').value = tournament.prizePool;
+                document.getElementById('edit-fee').value = tournament.entryFee;
+                document.getElementById('edit-room-id').value = tournament.roomId || '';
+                document.getElementById('edit-room-password').value = tournament.password || '';
+                document.getElementById('edit-status').value = tournament.status;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        },
+
+        hideEditModal() { 
+            const modal = document.getElementById('edit-tournament-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            this.state.editingTournamentId = null;
+        },
+
+        showModeratorLoginModal() {
+            const modal = document.getElementById('moderator-login-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        },
+        
+        hideModeratorLoginModal() {
+            const modal = document.getElementById('moderator-login-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        },
+
+        // ===================================================================
+        // USER AUTHENTICATION & ACTIONS
+        // ===================================================================
+        addFormSubmitListeners() {
+            document.getElementById('login-form').addEventListener('submit', (e) => { e.preventDefault(); this.login(); });
+            document.getElementById('register-form').addEventListener('submit', (e) => { e.preventDefault(); this.register(); });
+            document.getElementById('create-tournament-form').addEventListener('submit', (e) => { e.preventDefault(); this.createTournament(); });
+            document.getElementById('edit-tournament-form').addEventListener('submit', (e) => { e.preventDefault(); this.saveTournament(); });
+            document.getElementById('moderator-login-form').addEventListener('submit', (e) => { e.preventDefault(); this.moderatorLogin(); });
+            document.getElementById('edit-homepage-form').addEventListener('submit', (e) => { e.preventDefault(); this.saveHomepage(); });
+            document.getElementById('add-leaderboard-form').addEventListener('submit', (e) => { e.preventDefault(); this.addLeaderboardPlayer(); });
+            document.getElementById('edit-rules-form').addEventListener('submit', (e) => { e.preventDefault(); this.saveRules(); });
+        },
+
+        login() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const user = this.state.users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                this.state.currentUser = user;
+                this.hideLoginModal();
+                this.updateUI();
+                this.showNotification(`Welcome back, ${user.ign}!`, 'success');
+            } else {
+                this.showNotification('Invalid username or password.', 'error');
+            }
+        },
+
+        logout() {
+            const ign = this.state.currentUser ? this.state.currentUser.ign : '';
+            this.showNotification(`Goodbye, ${ign}!`, 'info');
+            this.state.currentUser = null;
+            this.navigateTo('home');
+        },
+
+        register() {
+            const username = document.getElementById('register-username').value;
+            const ign = document.getElementById('register-ign').value;
+            const password = document.getElementById('register-password').value;
+
+            if (this.state.users.some(u => u.username === username)) {
+                this.showNotification('Username already exists.', 'error');
+                return;
+            }
+
+            const newUser = {
+                id: `user_${Date.now()}`, username, ign, password, isAdmin: false, registeredTournaments: []
+            };
+            
+            this.state.users.push(newUser);
+            this.state.currentUser = newUser;
+            
+            this.hideRegisterModal();
+            this.updateUI();
+            this.showNotification('Registration successful! Welcome!', 'success');
+        },
+        
+        moderatorLogin() { 
+            const password = document.getElementById('moderator-password').value;
+            if (password === "aradhyaHGbattleZoneharsh") {
+                this.state.isModerator = true;
+                this.hideModeratorLoginModal();
+                document.getElementById('moderator-password').value = '';
+                this.showNotification("Moderator login safal hua.", "success");
+                this.navigateTo('moderator');
+            } else {
+                this.showNotification("Galat password!", "error");
+            }
+        },
+
+        // ===================================================================
+        // TOURNAMENT ACTIONS
+        // ===================================================================
+        registerForTournament(tournamentId) {
+            if (!this.state.currentUser) {
+                this.showNotification('You must be logged in to register.', 'error');
+                this.showLoginModal();
+                return;
+            }
+
+            const tournament = this.state.tournaments.find(t => t.id === tournamentId);
+            if (tournament.registeredPlayers.length >= tournament.maxPlayers) {
+                this.showNotification('Sorry, this tournament is full.', 'error');
+                return;
+            }
+            
+            this.state.currentUser.registeredTournaments.push(tournamentId);
+            tournament.registeredPlayers.push(this.state.currentUser.id);
+
+            this.showNotification(`Successfully registered for ${tournament.title}!`, 'success');
+            this.hideDetailModal();
+            this.updateUI();
+        },
+        
+        filterTournaments(filter) {
+            this.state.currentFilter = filter;
+            this.renderTournamentsPage();
+        },
+        
+        saveTournament() {
+            const id = this.state.editingTournamentId;
+            const title = document.getElementById('edit-title').value;
+            const time = document.getElementById('edit-time').value;
+            const prizePool = document.getElementById('edit-prize').value;
+            const entryFee = parseInt(document.getElementById('edit-fee').value) || 0;
+            const roomId = document.getElementById('edit-room-id').value || null;
+            const password = document.getElementById('edit-room-password').value || null;
+            const status = document.getElementById('edit-status').value;
+
+            if (!title || !time || !prizePool) {
+                 this.showNotification('Title, Time, and Prize Pool are required.', 'error');
+                return;
+            }
+
+            if (id) { // Editing existing
+                const tournament = this.state.tournaments.find(t => t.id === id);
+                if (tournament) {
+                    tournament.title = title;
+                    tournament.time = new Date(time).toISOString();
+                    tournament.prizePool = prizePool;
+                    tournament.entryFee = entryFee;
+                    tournament.roomId = roomId;
+                    tournament.password = password;
+                    tournament.status = status;
+                    this.showNotification("Tournament details updated!", "success");
+                }
+            } else { // Creating new
+                const newTournament = {
+                    id: `tourney_${Date.now()}`, title, time: new Date(time).toISOString(), prizePool, entryFee, roomId, password, status,
+                    map: 'Bermuda', mode: 'Solo', maxPlayers: 48, registeredPlayers: [], 
+                };
+                this.state.tournaments.unshift(newTournament);
+                this.showNotification('New match created successfully!', 'success');
+            }
+            
+            this.hideEditModal();
+            this.updateUI();
+        },
+        
+        deleteTournament(tournamentId) {
+            if (confirm("Kya aap sach mein is tournament ko delete karna chahte hain?")) {
+                this.state.tournaments = this.state.tournaments.filter(t => t.id !== tournamentId);
+                this.updateUI();
+                this.showNotification('Tournament deleted.', 'info');
+            }
+        },
+
+        // ===================================================================
+        // MODERATOR CONTENT ACTIONS
+        // ===================================================================
+        saveHomepage() {
+            this.state.homeContent.heading = document.getElementById('homepage-heading').value;
+            this.state.homeContent.paragraph = document.getElementById('homepage-paragraph').value;
+            this.renderHomePage();
+            this.showNotification('Home page content saved!', 'success');
+        },
+
+        addLeaderboardPlayer() {
+            const ign = document.getElementById('lb-ign').value;
+            const kills = parseInt(document.getElementById('lb-kills').value) || 0;
+            const wins = parseInt(document.getElementById('lb-wins').value) || 0;
+
+            if (!ign) {
+                this.showNotification('Player IGN is required.', 'error');
+                return;
+            }
+            
+            const points = (kills * 10) + (wins * 50); // Example point calculation
+            this.state.leaderboard.push({ ign, kills, wins, points });
+            
+            this.renderModLeaderboard();
+            this.renderLeaderboardPage(); // Update the public page too
+            document.getElementById('add-leaderboard-form').reset();
+            this.showNotification('Player added to leaderboard.', 'success');
+        },
+
+        deleteLeaderboardPlayer(index) {
+            if (confirm(`Kya aap is khiladi ko leaderboard se hatana chahte hain?`)) {
+                this.state.leaderboard.splice(index, 1);
+                this.renderModLeaderboard();
+                this.renderLeaderboardPage();
+                this.showNotification('Player removed from leaderboard.', 'info');
+            }
+        },
+
+        saveRules() {
+            this.state.rulesContent.general = document.getElementById('rules-general').value.split('\n').filter(line => line.trim() !== '');
+            this.state.rulesContent.gameplay = document.getElementById('rules-gameplay').value.split('\n').filter(line => line.trim() !== '');
+            this.state.rulesContent.points = document.getElementById('rules-points').value;
+            this.renderRulesPage();
+            this.showNotification('Rules have been updated!', 'success');
+        },
+
+        // ===================================================================
+        // UTILITY & HELPER FUNCTIONS
+        // ===================================================================
+        showNotification(message, type = 'success') {
+            const box = document.getElementById('notification-box');
+            const msg = document.getElementById('notification-message');
+
+            msg.textContent = message;
+            box.classList.remove('bg-green-500', 'bg-red-500', 'bg-blue-500', 'bg-cyan-500');
+
+            if (type === 'success') box.classList.add('bg-green-500');
+            else if (type === 'error') box.classList.add('bg-red-500');
+            else if (type === 'info') box.classList.add('bg-cyan-500');
+            else box.classList.add('bg-blue-500');
+
+            box.classList.remove('translate-x-[120%]');
+            setTimeout(() => {
+                box.classList.add('translate-x-[120%]');
+            }, 3000);
+        },
+
+        copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                this.showNotification('Copied to clipboard!', 'info');
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+                this.showNotification('Failed to copy.', 'error');
+            });
+        },
+        
+        updateLiveCountdowns() {
+            const now = new Date();
+            this.state.tournaments.forEach(t => {
+                const tournamentTime = new Date(t.time);
+                
+                if (t.status === 'Upcoming' && now >= tournamentTime) {
+                    t.status = 'Live';
+                    this.updateUI();
+                }
+
+                const countdownElem = document.getElementById(`countdown-${t.id}`);
+                if (countdownElem && t.status === 'Upcoming') {
+                    const diff = tournamentTime - now;
+                    if (diff > 0) {
+                        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((diff % (1000 * 60)) / 1000);
+                        countdownElem.textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                    } else {
+                        countdownElem.textContent = "Starting now...";
+                    }
+                }
+            });
+        },
+
+        // ===================================================================
+        // MOCK DATA GENERATION
+        // ===================================================================
+        generateMockData() {
+            this.state.users = [
+                { id: 'user_1', username: 'admin', ign: 'ADMIN_PRO', password: 'admin', isAdmin: true, registeredTournaments: [] },
+                { id: 'user_2', username: 'player1', ign: 'SniperKing', password: '123', isAdmin: false, registeredTournaments: [] },
+                { id: 'user_3', username: 'player2', ign: 'GlooWallMaster', password: '123', isAdmin: false, registeredTournaments: [] }
+            ];
+
+            const now = new Date();
+            this.state.tournaments = [
+                {
+                    id: 'tourney_1', title: 'Morning Mayhem (Solo)', time: new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString(), map: 'Bermuda', mode: 'Solo', entryFee: 0, prizePool: '1000 Diamonds', status: 'Upcoming', maxPlayers: 48, registeredPlayers: [], roomId: null, password: null
+                },
+                {
+                    id: 'tourney_2', title: 'Night Squad Battle', time: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(), map: 'Kalahari', mode: 'Squad', entryFee: 100, prizePool: '10000 Diamonds', status: 'Upcoming', maxPlayers: 48, registeredPlayers: [], roomId: null, password: null
+                },
+                {
+                    id: 'tourney_3', title: 'Live Duo Challenge', time: new Date(now.getTime() - 5 * 60 * 1000).toISOString(), map: 'Purgatory', mode: 'Duo', entryFee: 50, prizePool: '5000 Diamonds', status: 'Upcoming', maxPlayers: 48, registeredPlayers: [], roomId: null, password: null
+                },
+                {
+                    id: 'tourney_4', title: 'Weekly Bonanza Finals', time: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(), map: 'Alpine', mode: 'Squad', entryFee: 200, prizePool: '₹50,000', status: 'Finished', maxPlayers: 48, registeredPlayers: [], roomId: '1234567', password: 'gg'
+                },
+                 {
+                    id: 'tourney_5', title: 'Afternoon Rush', time: new Date(now.getTime() + 5 * 60 * 60 * 1000).toISOString(), map: 'Bermuda', mode: 'Solo', entryFee: 20, prizePool: '2000 Diamonds', status: 'Upcoming', maxPlayers: 48, registeredPlayers: [], roomId: null, password: null
+                },
+            ];
+            
+            this.state.leaderboard = [
+                { ign: 'Mortal', kills: 150, wins: 12, points: 2000 },
+                { ign: 'Scout', kills: 145, wins: 10, points: 1950 },
+                { ign: 'Jonathan', kills: 160, wins: 8, points: 2080 },
+                { ign: 'SniperKing', kills: 120, wins: 9, points: 1650 },
+                { ign: 'GlooWallMaster', kills: 90, wins: 11, points: 1450 },
+                { ign: 'Ravan', kills: 110, wins: 7, points: 1450 },
+                { ign: 'Dynamo', kills: 100, wins: 6, points: 1300 },
+            ];
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        app.init();
+    });
+    </script>
+
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+<!-- Initialize Firebase -->
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBzfxrDGswRqv3buttpxDFP4nICB025UrA",
+    authDomain: "hgbattlezone-live.firebaseapp.com",
+    projectId: "hgbattlezone-live",
+    storageBucket: "hgbattlezone-live.appspot.com",
+    messagingSenderId: "782781083399",
+    appId: "1:782781083399:web:eda54ac3fe3bcb76119fa2"
+  };
+  const app = firebase.initializeApp(firebaseConfig);
+</script>
+
+</body>
+</html>
